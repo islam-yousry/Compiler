@@ -2,6 +2,7 @@
 #include <set>
 #include <string>
 #include "Utilities.h"
+#include <algorithm>
 
 using namespace std;
 
@@ -74,4 +75,12 @@ bool replace_all(string& s, string match, string replace){
     }
     s = res;
     return done;
+}
+
+
+void truncate(string& s){
+    while(!s.empty() && s.back() == ' ') s.pop_back();
+    reverse(s.begin(),s.end());
+    while(!s.empty() && s.back() == ' ') s.pop_back();
+    reverse(s.begin(),s.end());
 }

@@ -5,6 +5,8 @@
         "string": "cpp",
         "algorithm": "cpp",
         "deque": "cpp",
-        "set": "cpp"
+        "set": "cpp",
+        "cmath": "cpp",
+        "*.tcc": "cpp"
     }
 }

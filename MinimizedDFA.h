@@ -7,13 +7,13 @@ using namespace std;
 
 
 class MinimizedDFA{
-
-public:
+private:
     vector<vector<Entity*>> groups;
 
     Entity* head;
     set<Entity*> minimized_states;
 
+public:
 
     /**
      * return true if the two entities belong to the same group.
@@ -34,13 +34,13 @@ public:
     construct table state for Minimzer DFA
     */
 
-    void constructMinimizedDFA(vector<Entity*>& table);
+    void construct_minimized_DFA(vector<Entity*>& table);
 
 
 
     void print_minimzed_DFA(set<char>& inputs);
 
-
+    Entity* get_head();
 
 };
 #endif

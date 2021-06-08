@@ -76,7 +76,7 @@ void MinimizedDFA::minimize(map<string,vector<string>>& regularExpression, vecto
 }
 
         
-void MinimizedDFA::constructMinimizedDFA(vector<Entity*>& table){
+void MinimizedDFA::construct_minimized_DFA(vector<Entity*>& table){
     map<Entity*,Entity*> entity_togroup;
     int num = 0;
     for(vector<Entity*> group : groups){
@@ -113,4 +113,9 @@ void MinimizedDFA::print_minimzed_DFA(set<char>& inputs){
         }
         cout << "\n";
     }
+}
+
+
+Entity* MinimizedDFA::get_head(){
+    return this->head;
 }

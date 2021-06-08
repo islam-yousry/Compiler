@@ -8,8 +8,7 @@
 using namespace std;
 
 
-// set<string> reserved{"|","+","*","(",")"};
-const string EPSON = "EPSON";
+const string EPSON = "\\L";
 
 
 /**
@@ -39,5 +38,10 @@ vector<string> divide_on(string s, char divider);
  */
 
 bool replace_all(string& s, string match, string replace);
+
+/**
+ * truncate given string.
+ */
+void truncate(string& s);
 
 #endif

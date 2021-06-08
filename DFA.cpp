@@ -43,13 +43,8 @@ void DFA::next_move(map<char,Entity*>& next_state, Node* node){
 
 
 
-/**
- * construct Deteminstice Finite Automate from NonDetermenistic finite Automate.
- * 
- */
 
-
-void DFA::constructDFA(vector<Graph*>& graphes){
+void DFA::construct_DFA(vector<Graph*>& graphes){
      
     vector<Node*> head;
     for(Graph* graph : graphes){
@@ -92,4 +87,13 @@ void DFA::print_table(){
         }cout <<"\n";
         
     }
+}
+
+
+vector<Entity*>& DFA::get_table(){
+    return this->table;
+}
+
+set<char>& DFA::get_inputs(){
+    return this->inputs;
 }

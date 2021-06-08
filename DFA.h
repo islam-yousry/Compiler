@@ -9,10 +9,11 @@ using namespace std;
 
 class DFA{
 
-public:
+private:
+    map<vector<Node*>,Entity*> state_toentity;
     vector<Entity*> table;
     set<char> inputs;
-    map<vector<Node*>,Entity*> state_toentity;
+public:
 
 
 
@@ -37,10 +38,15 @@ public:
      */
 
 
-    void constructDFA(vector<Graph*>& graphes);
+    void construct_DFA(vector<Graph*>& graphes);
 
 
     void print_table();
+
+
+    vector<Entity*>& get_table();
+
+    set<char>& get_inputs();
 
 };
 

@@ -11,10 +11,16 @@ using namespace std;
 
 
 class LexicalParser{
-
+private:
+    int index;
+    Entity* entity;
 public:
-    void trace(string path, vector<string>& keywords, vector<char>& puncuations, Entity* head);
+    LexicalParser(Entity* head);
+    string next_token(string& path, vector<string>& keywords, vector<char>& puncuations);
 
+    bool has_next(string& path);
+
+    void resetIndex();
 };
 
 #endif
