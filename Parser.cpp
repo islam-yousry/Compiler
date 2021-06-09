@@ -69,12 +69,8 @@ void Parser::parse_input_program(vector<string>& keywords, vector<char>& puncuat
 }
 
 
-// left recursive
-// left factoring
-// generate parse table by first and follow functions
 
-
-set<string> get_first(map<string,vector<vector<string>>>& production_rules, string& non_terminal){
+set<string> Parser::get_first(map<string,vector<vector<string>>>& production_rules, string& non_terminal){
     set<string> first;
     if(production_rules.find(non_terminal) == production_rules.end()) {
         first.insert(non_terminal);
@@ -85,7 +81,6 @@ set<string> get_first(map<string,vector<vector<string>>>& production_rules, stri
         if(production_rules.find(terminal[0]) != production_rules.end()){
             for(int i = 0; i < terminal.size(); i++){
                 if(terminal[i] == non_terminal) {
-                    // cout << terminal[i] << " " << non_terminal << "\n";
                     break;
                 }
                 set<string> f = get_first(production_rules,terminal[i]);
@@ -98,19 +93,30 @@ set<string> get_first(map<string,vector<vector<string>>>& production_rules, stri
             }
         }else first.insert(terminal[0]);
     }
+
+    
     return first;
 }
 
-set<string> get_follow(map<string,vector<vector<string>>>& production_rules, string& s){
+set<string> Parser::get_follow(map<string,vector<vector<string>>>& production_rules, string& s){
+    replace_all(s,"\'","");
     set<string> follow;
+    if(s == start) follow.insert("$");
     for(auto it : production_rules){
         string non_terminal = it.first;
-        if(non_terminal == s) continue;
+        replace_all(non_terminal,"\'","");
         vector<vector<string>> terminals = it.second;
         for(vector<string> terminal : terminals){
+            for(string& r : terminal) {
+                replace_all(r,"\'","");
+            }
             if(find(terminal.begin(),terminal.end(),s) != terminal.end()){
                 int index = find(terminal.begin(),terminal.end(),s)-terminal.begin();
                 if(index == terminal.size()-1){
+                    if(terminal[index] == non_terminal) {
+
+                        continue;
+                    }
                     set<string> f = get_follow(production_rules,non_terminal);
                     follow.insert(f.begin(),f.end());
                 }
@@ -135,11 +141,12 @@ set<string> get_follow(map<string,vector<vector<string>>>& production_rules, str
             }  
         }
     }
+    
     return follow;
 }
 
 
-void eliminate_left_recursion(map<string,vector<vector<string>>>& production_rules){
+void Parser::eliminate_left_recursion(map<string,vector<vector<string>>>& production_rules){
     for(auto& it : production_rules){
         string non_terminal = it.first;
         vector<vector<string>>& terminals = it.second;
@@ -168,7 +175,7 @@ void eliminate_left_recursion(map<string,vector<vector<string>>>& production_rul
                 beta.push_back(non_terminal_dash);
                 terminal = beta;
                 alpha.push_back(non_terminal_dash);
-                production_rules[non_terminal_dash] = {alpha,{EPSON}};
+                production_rules[non_terminal+"`"] = {alpha,{EPSON}};
                 not_left_recursive = terminal;
             }
         }
@@ -177,6 +184,7 @@ void eliminate_left_recursion(map<string,vector<vector<string>>>& production_rul
 
 
 void Parser::generate_parsing_table(map<string,vector<vector<string>>>& production_rules){
+
     for(auto it : production_rules){
         string non_terminal = it.first;
         vector<vector<string>> terminals = it.second;
@@ -200,7 +208,7 @@ void Parser::generate_parsing_table(map<string,vector<vector<string>>>& producti
                             replace_all(st,"\'", " ");
                             truncate(st);
                             parsing_table[non_terminal][s] = non_terminal+"::="+st;
-                        }
+                        }  
                     }
                 }else{
                     replace_all(s,"\'", " ");
@@ -238,20 +246,18 @@ void Parser::print_parsing_table(){
 
 
 
-// EXPRESSION::=SIMPLE_EXPRESSION'relop'SIMPLE_EXPRESSION
-vector<string> get_terminals_of_production(string& production){
+vector<string> Parser::get_terminals_of_production(string& production){
     assert(production.size() > 0);
     string terminals_part = production.substr(find(production.begin(),production.end(),'=')-production.begin()+1);
     replace_all(terminals_part,"\'"," ");
     replace_all(terminals_part,"  "," ");
     truncate(terminals_part);
-    // cout << terminals_part << "\n";
     vector<string> terminals = divide_on(terminals_part,' ');
     return terminals;
 }
 
 
-void print_stack(stack<string> s){
+void Parser::print_stack(stack<string> s){
     while(s.size()){
         if(s.top() != "$") cout << s.top() << " ";
         s.pop();
@@ -260,44 +266,42 @@ void print_stack(stack<string> s){
 }
 
 void Parser::generate_leftmost_derivation_sentential(){
+    freopen("Parser Generator Output.txt","w",stdout);
     stack<string> s;
     s.push("$");
     s.push(start);
     string token = get_token();
     print_stack(s);
-    int i = 0;
-    while(token != "$" && i++ < 100){
-        cout << s.top() << " " << token << "\n";
+    while(token != "$"){
         if(parsing_table.find(s.top()) != parsing_table.end() && parsing_table[s.top()].find(token) != parsing_table[s.top()].end()){ // top of stack is nonterminal.
             string non_terminal = s.top();
             s.pop();
             vector<string> terminals = get_terminals_of_production(parsing_table[non_terminal][token]);
             while(terminals.size()){
-                s.push(terminals.back());
+                if(terminals.back() != EPSON) s.push(terminals.back());
                 terminals.pop_back();
-            }
-                 
+            } 
+            
         }
-        else if(s.top() == token){
+        else if(s.top() == token || (token == "assign" && s.top() == "=")){
             s.pop();
             token = get_token();
         }
         else { // error.
+            cout << "error: panic mode recovery is active"<< "\n";
+            if(parsing_table.find(s.top()) == parsing_table.end()){
+                s.push(token);
+            }
+            else{
+                s.pop();
+            }
         }
-        // print_stack(s);
+        print_stack(s);
     }
-    // for(string s: leftmost_derivation_sententials) cout << s <<"\n";
+    
 }
 
-// struct t{
-//     vector<string>
-//     vector<t> v;
 
-// };
-
-// void left_factoring(map<string,vector<vector<string>>>& production_rules){
-
-// }
 
 void Parser::parse_CFG(){
     ifstream inputCFG( "CFG Input.txt");
@@ -331,21 +335,8 @@ void Parser::parse_CFG(){
     eliminate_left_recursion(production_rules);
     
     generate_parsing_table(production_rules);
-    // print_parsing_table();
-    string r = "STATEMENT_LIST`";
-    set<string> f  = get_first(production_rules,r);
-    for(string s : f) cout << s << " ";
+    print_parsing_table();
     
-
-    // for(auto it : production_rules){
-    //     cout << it.first << "\n";
-    //     for(vector<string> v : it.second){
-    //         for(string s : v) cout << s << " ";
-    //         cout << "\n";
-    //     }
-    //     cout << "\n";
-    // }
-
 }
 
 

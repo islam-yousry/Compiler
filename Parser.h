@@ -28,11 +28,42 @@ private:
     * add a pucuation.
     */
 
-
-
     void add_puncuations(string s, vector<char>& puncuations);
+     
 
+    // phase two functions.
+
+    /**
+     * get next token from the lexical analyzer output.
+     */
     string get_token();
+
+
+    /**
+     * get first terminals of the given non terminal.
+     */
+    set<string> get_first(map<string,vector<vector<string>>>& production_rules, string& non_terminal);
+
+    /**
+     * get follow terminals of the given non terminal.
+    */
+
+    set<string> get_follow(map<string,vector<vector<string>>>& production_rules, string& s);
+
+    /**
+     * implement elimination left recursion algorithm.
+     */
+    void eliminate_left_recursion(map<string,vector<vector<string>>>& production_rules);
+
+    /**
+     * get terminals of given production.
+     */
+    vector<string> get_terminals_of_production(string& production);
+
+    /**
+     * print the given stack.
+     */
+    void print_stack(stack<string> s);
 
 public:
 

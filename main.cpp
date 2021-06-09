@@ -21,7 +21,6 @@ int main(){
     Parser parser = Parser();
     parser.parse_CFG();
     parser.parse_input_grammer(regularExpression,regularDefinition,puncuations,keywords);
-    // construct_parsing_table(regularExpression);
     parser.expand_nested_regular_defenition(regularDefinition);
     parser.evaluate_regular_expressions(regularExpression,regularDefinition);
 
